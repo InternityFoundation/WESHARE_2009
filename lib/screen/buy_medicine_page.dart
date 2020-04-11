@@ -94,7 +94,8 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
                             ),
                             filter: (med) => [med.med_name, med.med_category],
                             builder: (med) => Visibility(
-                                  visible: med.seller_email != user.email,
+                                  visible: (med.seller_email != user.email &&
+                                      med.isSold == false),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
@@ -154,7 +155,7 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
 //                                            print(x);
                                           },
                                           child: Text(
-                                            'Total distance: tap to reveal',
+                                            'Total distance (Approx.): tap to reveal',
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
