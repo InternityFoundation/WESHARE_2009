@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medishare/EntryWrapper.dart';
 import 'package:medishare/models/global_medicine.dart';
+import 'package:medishare/models/sell_medicine.dart';
 import 'package:medishare/models/user.dart';
 import 'package:medishare/screen/welcome_screen.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,9 @@ class MyApp extends StatelessWidget {
       providers: [
         StreamProvider<User>.value(value: UserAuthService().user),
         StreamProvider<List<GlobalMedicine>>.value(
-            value: GlobalMedicineService().globalMedicine)
+            value: GlobalMedicineService().globalMedicine),
+        StreamProvider<List<SellMedicine>>.value(
+            value: SellMedicineService().sellMedicine),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
