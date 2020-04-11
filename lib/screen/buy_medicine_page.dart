@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +9,14 @@ import 'package:intl/intl.dart';
 import 'package:medishare/models/global_medicine.dart';
 import 'package:medishare/models/sell_medicine.dart';
 import 'package:medishare/models/user.dart';
-import 'package:medishare/models/user_medicine.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:search_page/search_page.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 Geoflutterfire geo = Geoflutterfire();
 var maskTextInputFormatter =
@@ -26,7 +29,32 @@ class BuyMedicinePage extends StatefulWidget {
 }
 
 class _BuyMedicinePageState extends State<BuyMedicinePage> {
-//  var distance = 'tap to reveal';
+  File _image;
+
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      _image = image;
+    });
+  }
+
+  Razorpay _razorpay;
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -141,6 +169,59 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
                                           child: Text(
                                             'Total distance: tap to reveal',
                                             style: TextStyle(fontSize: 18),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.white)),
+                                          child: InkWell(
+                                            onTap: () {
+                                              Alert(
+                                                context: context,
+                                                title: "UPLOAD PRESCRIPTION",
+                                                desc:
+                                                    "Upload prescription of medicine to continue",
+                                                buttons: [
+                                                  DialogButton(
+                                                    child: Text(
+                                                      "TAKE PICTURE",
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15),
+                                                    ),
+                                                    onPressed: () async {
+//                                                      Navigator.pop(context);
+                                                      await getImage();
+                                                      if (_image == null) {
+                                                        Fluttertoast.showToast(
+                                                            msg:
+                                                                'Upload prescription');
+                                                        return;
+                                                      }
+                                                      Navigator.pop(context);
+                                                      print('done');
+                                                    },
+                                                    width: 120,
+                                                  )
+                                                ],
+                                              ).show();
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: Text(
+                                                'BUY',
+                                                style: TextStyle(
+                                                    fontSize: 25,
+                                                    letterSpacing: 1.5,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         Divider(
