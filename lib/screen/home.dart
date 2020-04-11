@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:medishare/components/custom_drawer.dart';
 import 'package:medishare/models/global_medicine.dart';
+import 'package:medishare/models/sell_medicine.dart';
 import 'package:medishare/models/user.dart';
 import 'package:medishare/models/user_medicine.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 var maskTextInputFormatter =
     MaskTextInputFormatter(mask: "####-##-##", filter: {"#": RegExp(r'[0-9]')});
-var format_notime = new DateFormat('d MMM');
+var format_notime = new DateFormat('yyyy.MM.dd');
 
 class MainScreen extends StatefulWidget {
   @override
@@ -185,7 +186,7 @@ class _MainScreenState extends State<MainScreen> {
                                       Padding(
                                         padding: const EdgeInsets.all(4.0),
                                         child: Text(
-                                          'Quantity left: ${userMeds[index]['q_prescribed']}',
+                                          'Medicines to eat: ${userMeds[index]['q_prescribed']}',
                                           style: TextStyle(fontSize: 16),
                                         ),
                                       ),
@@ -258,21 +259,8 @@ class _MainScreenState extends State<MainScreen> {
                                         padding: const EdgeInsets.all(4.0),
                                         child: InkWell(
                                           onTap: () async {
-                                            Position position = await Geolocator()
-                                                .getCurrentPosition(
-                                                    desiredAccuracy:
-                                                        LocationAccuracy
-                                                            .bestForNavigation)
-                                                .then((val) {
-                                              print(val.toString());
-                                            }).catchError((e) {
-                                              Permission.location.request();
-                                              Fluttertoast.showToast(
-                                                  msg:
-                                                      'Give location permission/enable location');
-                                              print(e.toString());
-                                            });
-//                                            print(position.toString());
+                                            await addMedicineSell(
+                                                context, userMeds[index], user);
                                           },
                                           child: Icon(
                                             Icons.share,
@@ -295,6 +283,83 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  //--------------------------ADD SELL MED----------------------------------
+
+  addMedicineSell(context, DocumentSnapshot med, User user) {
+    TextEditingController medqty = TextEditingController();
+    TextEditingController medprice = TextEditingController();
+
+    TextEditingController expdate = TextEditingController();
+
+    var key = GlobalKey<FormState>();
+
+    Alert(
+        context: context,
+        title: "SELL",
+        content: Form(
+          key: key,
+          child: Column(
+            children: <Widget>[
+              Text(
+                'Medicine Name: ' + med['name'],
+                style: TextStyle(fontSize: 18),
+              ),
+              TextFormField(
+                controller: medprice,
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v.isEmpty) return 'Can not be empty';
+                  return null;
+                },
+                decoration: InputDecoration(
+                  icon: Icon(Icons.arrow_forward_ios),
+                  labelText: 'Medicine price',
+                ),
+              ),
+            ],
+          ),
+        ),
+        buttons: [
+          DialogButton(
+            onPressed: () async {
+              if (key.currentState.validate()) {
+//                DateTime date = DateTime.parse(expdate.text);
+//                Timestamp datet = Timestamp.fromDate(date);
+
+                Position pos = await Geolocator().getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.bestForNavigation);
+
+                if (pos == null) {
+                  Permission.location.request();
+                  Fluttertoast.showToast(
+                      msg: 'Give location permission/enable location');
+                }
+
+                GeoPoint point = GeoPoint(pos.latitude, pos.longitude);
+                await SellMedicineService().addSellMedicine(SellMedicine(
+                    med_name: med['name'],
+                    isSold: false,
+                    exp_date: med['exp_date'],
+                    seller_email: user.email,
+                    seller_address: null,
+                    med_price: int.parse(medprice.text),
+                    med_qty: med['q_left'],
+                    seller_name: user.name,
+                    seller_location: point));
+
+                print('updated');
+                Navigator.pop(context);
+                Fluttertoast.showToast(msg: 'Medicine marked for sale');
+              }
+            },
+            child: Text(
+              "SELL",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]).show();
   }
 
   //-----------------------------------------------ADD MEDICINE DIALOGUE-------------------------------
