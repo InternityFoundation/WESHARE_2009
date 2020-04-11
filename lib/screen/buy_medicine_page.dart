@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:intl/intl.dart';
+import 'package:medishare/models/bought_product.dart';
 import 'package:medishare/models/global_medicine.dart';
 import 'package:medishare/models/sell_medicine.dart';
 import 'package:medishare/models/user.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:medishare/screen/medicine_bought_page.dart';
 import 'package:provider/provider.dart';
 import 'package:search_page/search_page.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -37,22 +39,6 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
     setState(() {
       _image = image;
     });
-  }
-
-  Razorpay _razorpay;
-  @override
-  void initState() {
-    super.initState();
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _razorpay.clear();
   }
 
   @override
@@ -116,13 +102,13 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Text(
-                                          'seller : ${med.seller_email}',
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                        SizedBox(
-                                          height: 4,
-                                        ), //-------------------------------------------------
+//                                        Text(
+//                                          'seller : ${med.seller_email}',
+//                                          style: TextStyle(fontSize: 18),
+//                                        ),
+//                                        SizedBox(
+//                                          height: 4,
+//                                        ), //-------------------------------------------------
                                         Text(
                                           'Name : ${med.med_name}',
                                           style: TextStyle(fontSize: 18),
@@ -203,6 +189,13 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
                                                         return;
                                                       }
                                                       Navigator.pop(context);
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MedicineBoughtPage(
+                                                                    med: med,
+                                                                  )));
                                                       print('done');
                                                     },
                                                     width: 120,
@@ -438,6 +431,7 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
                 await SellMedicineService().addSellMedicine(
                   SellMedicine(
                       med_name: med.name,
+                      med_category: med.category,
                       isSold: false,
                       exp_date: datet,
                       seller_email: user.email,
