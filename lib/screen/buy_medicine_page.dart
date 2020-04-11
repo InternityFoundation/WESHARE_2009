@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:intl/intl.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:medishare/models/bought_product.dart';
 import 'package:medishare/models/global_medicine.dart';
 import 'package:medishare/models/sell_medicine.dart';
@@ -231,107 +232,162 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
 
 //-----------------------------BOUGHT MEDICINE LIST----------------------------
 
-//                LimitedBox(
-//                  maxHeight: MediaQuery.of(context).size.height * 0.8,
-//                  child: ListView.builder(
-//                    itemCount: sellmedicine.length,
-//                    itemBuilder: (context, index) {
-//                      if (sellmedicine.length == 0)
-//                        return Center(
-//                          child: Text('You are not selling anything'),
-//                        );
-//                      return Card(
-//                        color: Color(0xff191919),
-//                        elevation: 26,
-//                        child: Row(
-//                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                          crossAxisAlignment: CrossAxisAlignment.start,
-//                          children: <Widget>[
-//                            Container(
-//                              width: 100,
-//                              child: Column(
-//                                children: <Widget>[
-//                                  Padding(
-//                                    padding: const EdgeInsets.all(1.0),
-//                                    child: Image(
-//                                      image: AssetImage('images/capsule.png'),
-//                                      height: 90,
-//                                      width: 90,
-//                                      fit: BoxFit.cover,
-//                                    ),
-//                                  ),
-//                                  Padding(
-//                                    padding: const EdgeInsets.all(4.0),
-//                                    child: Text(
-//                                      '${sellmedicine[index].med_name}',
-//                                      style: TextStyle(fontSize: 16),
-//                                      softWrap: true,
-//                                    ),
-//                                  )
-//                                ],
-//                              ),
-//                            ),
-//                            Column(
-//                              mainAxisSize: MainAxisSize.max,
-//                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                              crossAxisAlignment: CrossAxisAlignment.start,
-//                              children: <Widget>[
-//                                Padding(
-//                                  padding: const EdgeInsets.all(4.0),
-//                                  child: Text(
-//                                    'Quantity available: ${sellmedicine[index].med_qty}',
-//                                    style: TextStyle(fontSize: 16),
-//                                  ),
-//                                ),
-//                                Padding(
-//                                  padding: const EdgeInsets.all(4.0),
-//                                  child: Text(
-//                                    'Total Price: ${sellmedicine[index].med_price}',
-//                                    style: TextStyle(fontSize: 16),
-//                                  ),
-//                                ),
-//
-//                                Padding(
-//                                  padding: const EdgeInsets.all(4.0),
-//                                  child: Text(
-//                                    'Expiry date : ${format_notime.format(sellmedicine[index].exp_date.toDate())}',
-//                                    style: TextStyle(fontSize: 16),
-//                                  ),
-//                                ),
-////
-//                              ],
-//                            ),
-//                            Column(
-//                              mainAxisSize: MainAxisSize.max,
-//                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                              children: <Widget>[
-//                                Padding(
-//                                  padding: const EdgeInsets.all(4.0),
-//                                  child: InkWell(
-//                                    onTap: () {
-//                                      SellMedicineService().deleteSellMedicine(
-//                                          sellmedicine[index].ID);
-//                                    },
-//                                    child: Icon(
-//                                      Icons.delete,
-//                                      size: 30,
-//                                    ),
-//                                  ),
-//                                ),
-//                              ],
-//                            )
-//                          ],
-//                        ),
-//                      );
-//                    },
-//                  ),
-//                ),
+                StreamBuilder(
+                    stream:
+                        BoughtMedicineService(email: user.email).boughtMedicine,
+                    builder: (context, snapshot) {
+                      List<BoughtMedicine> boughtMeds = snapshot.data;
+
+                      if (boughtMeds.length == 0) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 68.0),
+                            child: Text(
+                              'You have not purchased anything',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return LimitedBox(
+                        maxHeight: MediaQuery.of(context).size.height * 0.8,
+                        child: ListView.builder(
+                          itemCount: boughtMeds.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              elevation: 26,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    width: 100,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(1.0),
+                                          child: Image(
+                                            image: AssetImage(
+                                                'images/capsule.png'),
+                                            height: 90,
+                                            width: 90,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Text(
+                                            '${boughtMeds[index].med_name}',
+                                            style: TextStyle(fontSize: 16),
+                                            softWrap: true,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          width: 210,
+                                          child: Text(
+                                            'Seller email: ${boughtMeds[index].seller_email}',
+                                            softWrap: true,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Text(
+                                          'Medicines Quantitiy: ${boughtMeds[index].med_qty}',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Text(
+                                          'Total Price: ${boughtMeds[index].med_price}',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      MaterialButton(
+                                        child: Text(
+                                          'Go to Seller',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        color: Colors.brown[700],
+                                        onPressed: () {
+                                          openMapsSheet(
+                                              context,
+                                              boughtMeds[index]
+                                                  .seller_location);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  openMapsSheet(context, GeoPoint point) async {
+    try {
+      final title = "Seller House";
+      final des = "";
+      final coords = Coords(point.latitude, point.longitude);
+      final availableMaps = await MapLauncher.installedMaps;
+
+      print(availableMaps);
+
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    for (var map in availableMaps)
+                      ListTile(
+                        onTap: () => map.showMarker(
+                            coords: coords, title: title, description: des),
+                        title: Text(map.mapName),
+                        leading: Image(
+                          image: map.icon,
+                          height: 30.0,
+                          width: 30.0,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   getCurrentDistance(GeoPoint geoPoint) async {
@@ -349,108 +405,5 @@ class _BuyMedicinePageState extends State<BuyMedicinePage> {
     return distanceInMeters * 0.001;
   }
 
-  //-----------------------------------------------ADD MEDICINE DIALOGUE-------------------------------
-
-  addMedicineSell(context, GlobalMedicine med, User user) {
-    TextEditingController medqty = TextEditingController();
-    TextEditingController medprice = TextEditingController();
-
-    TextEditingController expdate = TextEditingController();
-
-    var key = GlobalKey<FormState>();
-
-    Alert(
-        context: context,
-        title: "ADD",
-        content: Form(
-          key: key,
-          child: Column(
-            children: <Widget>[
-              Text(
-                'Medicine Name: ' + med.name,
-                style: TextStyle(fontSize: 18),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: medqty,
-                validator: (v) {
-                  if (v.isEmpty) return 'Can not be empty';
-                  return null;
-                },
-                decoration: InputDecoration(
-                  icon: Icon(Icons.arrow_forward_ios),
-                  labelText: 'Quantity Available For Sale',
-                ),
-              ),
-              TextFormField(
-                controller: medprice,
-                keyboardType: TextInputType.number,
-                validator: (v) {
-                  if (v.isEmpty) return 'Can not be empty';
-                  return null;
-                },
-                decoration: InputDecoration(
-                  icon: Icon(Icons.arrow_forward_ios),
-                  labelText: 'Medicine price',
-                ),
-              ),
-              TextFormField(
-                controller: expdate,
-                inputFormatters: [maskTextInputFormatter],
-                keyboardType: TextInputType.number,
-                validator: (v) {
-                  if (v.isEmpty) return 'Can not be empty';
-                  return null;
-                },
-                decoration: InputDecoration(
-                  icon: Icon(Icons.arrow_forward_ios),
-                  labelText: 'Expiry Date',
-                  hintText: 'YYYY-MM-DD',
-                ),
-              ),
-            ],
-          ),
-        ),
-        buttons: [
-          DialogButton(
-            onPressed: () async {
-              if (key.currentState.validate()) {
-                DateTime date = DateTime.parse(expdate.text);
-                Timestamp datet = Timestamp.fromDate(date);
-
-                Position pos = await Geolocator().getCurrentPosition(
-                    desiredAccuracy: LocationAccuracy.bestForNavigation);
-
-                if (pos == null) {
-                  Permission.location.request();
-                  Fluttertoast.showToast(
-                      msg: 'Give location permission/enable location');
-                }
-
-                GeoPoint point = GeoPoint(pos.latitude, pos.longitude);
-                await SellMedicineService().addSellMedicine(
-                  SellMedicine(
-                      med_name: med.name,
-                      med_category: med.category,
-                      isSold: false,
-                      exp_date: datet,
-                      seller_email: user.email,
-                      seller_address: null,
-                      med_price: int.parse(medprice.text),
-                      med_qty: int.parse(medqty.text),
-                      seller_name: user.name,
-                      seller_location: point),
-                );
-
-                print('updated');
-                Navigator.pop(context);
-              }
-            },
-            child: Text(
-              "ADD",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ]).show();
-  }
+//
 }

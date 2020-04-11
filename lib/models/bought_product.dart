@@ -49,7 +49,7 @@ class BoughtMedicineService {
     }).toList();
   }
 
-  Stream<List<BoughtMedicine>> get userMedicine {
+  Stream<List<BoughtMedicine>> get boughtMedicine {
     return _firestore
         .collection(ref)
         .document(email)
