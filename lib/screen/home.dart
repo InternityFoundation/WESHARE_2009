@@ -340,6 +340,7 @@ class _MainScreenState extends State<MainScreen> {
                 GeoPoint point = GeoPoint(pos.latitude, pos.longitude);
                 await SellMedicineService().addSellMedicine(SellMedicine(
                     med_name: med['name'],
+                    med_category: med['category'],
                     isSold: false,
                     exp_date: med['exp_date'],
                     seller_email: user.email,

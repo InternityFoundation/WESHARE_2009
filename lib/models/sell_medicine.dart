@@ -48,6 +48,13 @@ class SellMedicineService {
     await Firestore.instance.collection('sell_medicine').document(id).delete();
   }
 
+  void updateisSold(String id) async {
+    await Firestore.instance
+        .collection('sell_medicine')
+        .document(id)
+        .updateData({'isSold': true});
+  }
+
   List<SellMedicine> _sellMedicinefromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return SellMedicine(

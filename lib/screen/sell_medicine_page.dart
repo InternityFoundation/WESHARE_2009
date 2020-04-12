@@ -182,6 +182,17 @@ class _SellMedicinePageState extends State<SellMedicinePage> {
                                       style: TextStyle(fontSize: 16),
                                     ),
                                   ),
+                                  Visibility(
+                                    visible: sellmedicine[index].isSold == true,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Text(
+                                        'Sold',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.green),
+                                      ),
+                                    ),
+                                  )
 //
                                 ],
                               ),
@@ -214,7 +225,6 @@ class _SellMedicinePageState extends State<SellMedicinePage> {
                     },
                   ),
                 ),
-                //----------------------------- MEDICINE LIST----------------------------
               ],
             ),
           ),
