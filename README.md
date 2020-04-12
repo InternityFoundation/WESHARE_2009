@@ -9,3 +9,5 @@ Medi Share - Your all Time Medicine Assistant
 
 Medi_Share will be one in all app to keep in track of all your medicine, generously share your extra available dosage and indeed provide a platform to buy those medicine from the local neighbourhood. This feature rich app will stand helpful not only during this time of the
 pandemic but also will solve a bigger problem of every household by providing medicine to economically weaker people at half of the original cost.
+
+For More Info Vsit Git Wiki of this Repo 😉
